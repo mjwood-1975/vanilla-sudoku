@@ -1,0 +1,75 @@
+<html>
+  <head>
+    <title>Vanilla Sudoku</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="Play sudoku puzzles in any browser">
+    <meta name="keywords" content="Sudoku, puzzles, games">
+    <meta name="author" content="Michael Wood">
+    <link rel="stylesheet" href="styles/style.css" type="text/css"> 
+    <script language="javascript" src="js/script.js"></script>
+  </head>
+
+  <body onLoad="createLayout();">
+    <h1>~Vanilla Sudoku~</h1>
+    <h3>Plain is sometimes the best flavor</h3>
+    <br />
+    <center>
+        <table id="primaryGrid" cellpadding="0" cellspacing="0">
+        </table>
+
+        <div id="blurb">
+            This puzzle has been randomly generated on the fly for you.<br /><br />
+            It could be trivial, easy, medium, hard, or even impossible. There's really no way to know until you play.<br /><br />Try your luck or mash the New Puzzle button if you don't like the one you see.
+        </div>
+
+        <div id="newGame" class="modal">
+            <h1>Ack!</h1>
+            <p>Can't validate a game until you've put something in!</p>
+            <br />
+            <center>
+            <input class="button" type="button" value="Ok!" onClick="newGame.style.visibility = 'hidden';" />
+            <center>
+            <br />
+        </div>
+
+        <div id="invalidGame" class="modal">
+            <h1>Newp!</h1>
+            <p>
+            Your solution does not appear to be correct.
+            <br />
+            <b>Validate -Hints</b> won't tell you where or what, but <b>Validate +Hints</b> will!
+            <br />
+            <br />
+            You <em>could</em> use <b>Validate +Hints</b> to effectively "cheat" but you wouldn't do <em>that</em> now would you?
+            <br />
+            </p>
+            <center>
+            <input class="button" type="button" value="Bah!" onClick="invalidGame.style.visibility = 'hidden';" />
+            <center>
+            <br />
+        </div>
+
+        <div id="validGame" class="modal">
+            <h1 style="background-color: #efe">Hooray!</h1>
+            <p>
+            Your solution appears to be correct!
+            <br />
+            <br />
+            Remind me to never get into a brain fight with you...
+            <br />
+            </p>
+            <center>
+            <input class="button" type="button" value="Whee!" onClick="validGame.style.visibility = 'hidden';" />
+            <center>
+            <br />
+        </div>
+
+        <input class="button" id="buttonReset" type="button" value="Reset" onClick="resetPuzzle()" />
+        <input class="button" id="buttonValidateWithoutHints" type="button" value="Validate -Hints" onClick="validateSolution(false)" />
+        <input class="button" id="buttonValidateWithHints" type="button" value="Validate +Hints" onClick="validateSolution(true)" />
+        <input class="button" id="buttonNewPuzzle" type="button" value="New Puzzle" onClick="location.href='/'" />
+        <!-- <input class="button" id="buttonDebug" type="button" value="Debug" onClick="console.log(matrix)" /> -->
+    </center>
+  </body>
+</html>

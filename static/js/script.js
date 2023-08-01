@@ -3,12 +3,22 @@ let matrix
 
 // document.body.style.setProperty('--main-color',"#6c0")
 
+function updateLocalStorage() {
+    localStorage.setItem("matrix", JSON.stringify(matrix))
+}
+
 function createLayout() {
-    const gridRows = 9;
-    const gridCols = 9;
-    createMatrix()
-    prepareGridData()
-    applyMask()
+    const gridRows = 9
+    const gridCols = 9
+
+    let cachedMatrix = JSON.parse(localStorage.getItem("matrix")) // load puzzle from cache or generate?
+    if (cachedMatrix) {
+        matrix = cachedMatrix
+    } else {
+        createMatrix()
+        prepareGridData()
+        applyMask()
+    }
 
     for (let i=0; i<gridRows; i++) {
         let trNode = document.createElement('tr')
@@ -17,8 +27,9 @@ function createLayout() {
             let tdNode = document.createElement('td')
             tdNode.id = 'tr_' + i + '_td_' + j;
             if (matrix[i][j].mask) {
+                let guess = matrix[i][j].guess ? matrix[i][j].guess : "" // cache
                 tdNode.innerHTML = ""
-                tdNode.innerHTML = '<input class="cell" type="number" id="input_' + i + '_' + j + '" maxlength="1" size="1" onClick="gameStarted=true" onKeyDown="matrix[' + i + '][ ' + j + '].guess = Number(event.key); this.style.color = \'#47A992\'" />'
+                tdNode.innerHTML = '<input class="cell" type="number" id="input_' + i + '_' + j + '" maxlength="0" size="1" onClick="gameStarted=true" onKeyDown="matrix[' + i + '][' + j + '].guess = Number(event.key); this.style.color = \'#6096B4\'; updateLocalStorage();" value="' + guess + '" />'
             } else {
                 tdNode.innerHTML = matrix[i][j].value
                 matrix[i][j].guess = matrix[i][j].value
@@ -420,6 +431,7 @@ function validateSolution(hints) {
         }
         if (valid) {
             validGame.style.visibility = 'visible'
+            localStorage.removeItem("matrix")
         } else {
             invalidGame.style.visibility = 'visible'                    
         }
@@ -430,6 +442,7 @@ function validateSolution(hints) {
 }
 
 function resetPuzzle() {
+    localStorage.removeItem("matrix")
     for (y = 0; y < 9; y++) {
         for (x = 0; x < 9; x++) {
             if (matrix[y][x].guess) matrix[y][x].guess = null

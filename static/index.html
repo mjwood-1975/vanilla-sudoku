@@ -69,7 +69,7 @@
         <input class="button" id="buttonReset" type="button" value="Reset" onClick="resetPuzzle()" />
         <input class="button" id="buttonValidateWithoutHints" type="button" value="Validate -Hints" onClick="validateSolution(false)" />
         <input class="button" id="buttonValidateWithHints" type="button" value="Validate +Hints" onClick="validateSolution(true)" />
-        <input class="button" id="buttonNewPuzzle" type="button" value="New Puzzle" onClick="location.href='/'" />
+        <input class="button" id="buttonNewPuzzle" type="button" value="New Puzzle" onClick="location.href='/'; localStorage.removeItem('matrix')" />
         <!-- <input class="button" id="buttonDebug" type="button" value="Debug" onClick="console.log(matrix)" /> -->
     </center>
   </body>

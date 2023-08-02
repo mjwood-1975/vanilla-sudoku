@@ -11,7 +11,13 @@ function createLayout() {
     const gridRows = 9
     const gridCols = 9
 
-    let cachedMatrix = JSON.parse(localStorage.getItem("matrix")) // load puzzle from cache or generate?
+    let cachedMatrix;
+    try {
+        cachedMatrix = JSON.parse(localStorage.getItem("matrix")); 
+    } catch (e) {
+        console.log('Error trying to load saved matrix from localStorage', e.message);
+    }
+
     if (cachedMatrix) {
         matrix = cachedMatrix
     } else {

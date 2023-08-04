@@ -15,9 +15,15 @@ function createLayout() {
     if (cachedMatrix) {
         matrix = cachedMatrix
     } else {
+        let startTime = new Date();
         createMatrix()
         prepareGridData()
         applyMask()
+        let endTime = new Date();
+        let duration = (endTime.getTime() - startTime.getTime()) / 1000;
+        let timeMessage = `completion time: ${duration} ms`
+        matrix.timeMessage = timeMessage
+        console.log(timeMessage)
     }
 
     for (let i=0; i<gridRows; i++) {
@@ -128,6 +134,7 @@ function createLayout() {
             trNode.appendChild(tdNode)
         }
         primaryGrid.appendChild(trNode)
+        time.innerHTML = matrix.timeMessage
     }
 
     let pge = primaryGrid.getBoundingClientRect()
@@ -363,11 +370,40 @@ function createMatrix() {
     let cellToBoxMap = setupMap()
 
     let tries = 1
-    for (var rowIndex = 0; rowIndex < 9; rowIndex++) {
-        for (var colIndex = 0; colIndex < 9; colIndex++) {
+    for (let rowIndex = 0; rowIndex < 9; rowIndex++) {
+        // console.log('rowIndex: ', rowIndex)
+        for (let colIndex = 0; colIndex < 9; colIndex++) {
+            // console.log('    colIndex: ', colIndex)
             let exclusions = boxes[cellToBoxMap[rowIndex+"_"+colIndex]]
             exclusions = exclusions.concat(cols[colIndex])
             exclusions = exclusions.concat(matrix[rowIndex])
+            exclusions = [...new Set(exclusions)];
+
+            // no one wants ambiguity in their puzzles. Maybe?
+            // prevent vertical ambiguous pairs
+            if (rowIndex > 0) {
+                for (let x = 0; x < matrix[rowIndex].length; x++) {
+                    if (matrix[rowIndex][x] === matrix[rowIndex - 1][colIndex]) {
+                        if (!exclusions.includes(matrix[rowIndex - 1][x])) exclusions.push(matrix[rowIndex - 1][x])
+                        break
+                    }
+
+                }
+            }
+
+            // prevent horizontal ambiguous pairs
+            if (rowIndex > 0 && colIndex > 0) {
+                for (let y = 0; y < matrix.length; y++) {
+                    if (matrix[y].length > 0 && y < rowIndex) {
+                        for (let x = 0; x < matrix[y].length; x++) {
+                            if (matrix[rowIndex][colIndex - 1] === matrix[y][colIndex]) {
+                                if (!exclusions.includes(matrix[y][colIndex - 1])) exclusions.push(matrix[y][colIndex - 1])
+                                break
+                            }
+                        }
+                    }
+                }
+            }
 
             let validPool = []
             let set = [1,2,3,4,5,6,7,8,9]
@@ -397,7 +433,8 @@ function createMatrix() {
             rowIndex = rowIndex - 1
             tries++
             if (tries >= 20) {
-                // a bad combination of legally placed numbers earlier in the grid let to unplaceable numbers
+                // a bad combination of legally placed numbers earlier in the grid led to unplaceable numbers
+                console.log('standard tries exceded 20, reroll grid')
                 matrix = setupMatrix()
                 boxes = setupBoxes()
                 cols = setupCols()
@@ -410,8 +447,8 @@ function createMatrix() {
             tries = 1
         }
     }
-    return matrix
 }
+
 
 function validateSolution(hints) {
     let valid = true

@@ -7,6 +7,35 @@ function updateLocalStorage() {
     localStorage.setItem("matrix", JSON.stringify(matrix))
 }
 
+function displayNoteBox(cellId) {
+    let cell = document.getElementById(cellId).getBoundingClientRect()
+    let bnp = buttonNewPuzzle.getBoundingClientRect()
+    let pge = primaryGrid.getBoundingClientRect()
+    noteBox.style.position = "absolute"
+    noteBox.style.top = bnp.y + bnp.height + 10 + 'px'
+    noteBox.style.left = pge.x + pge.width + 10 + 'px'
+    noteBox.style.width = bnp.width
+    noteTable.style.width = bnp.width
+    noteBox.style.backgroundColor = "#fff"
+
+    for (let i = 0; i < 6; i++) {
+        let id = 'note_' + i
+        let td = document.getElementById(id)
+        td.style.height = td.getBoundingClientRect().width
+    }
+
+    noteBox.style.visibility = 'visible'
+
+}
+
+function hideNoteBox() {
+    noteBox.style.visibility = 'hidden'
+}
+
+function placeNote(index) {
+    console.log(index)
+}
+
 function createLayout() {
     const gridRows = 9
     const gridCols = 9
@@ -31,11 +60,12 @@ function createLayout() {
         trNode.id = 'tr_' + i
         for (let j=0; j<gridCols; j++) {
             let tdNode = document.createElement('td')
-            tdNode.id = 'tr_' + i + '_td_' + j;
+            tdNode.id = 'tr_' + i + '_td_' + j
+            tdNode.className = 'gridCell'
             if (matrix[i][j].mask) {
                 let guess = matrix[i][j].guess ? matrix[i][j].guess : "" // cache
                 tdNode.innerHTML = ""
-                tdNode.innerHTML = '<input class="cell" type="number" id="input_' + i + '_' + j + '" maxlength="0" size="1" onClick="gameStarted=true" onKeyDown="matrix[' + i + '][' + j + '].guess = Number(event.key); this.style.color = \'#6096B4\'; updateLocalStorage();" value="' + guess + '" />'
+                tdNode.innerHTML = '<input class="cell" type="number" id="input_' + i + '_' + j + '" maxlength="0" size="1" onClick="gameStarted=true" onKeyDown="if (this.value.length === 1) return false; matrix[' + i + '][' + j + '].guess = Number(event.key); this.style.color = \'#6096B4\'; updateLocalStorage();" value="' + guess + '" onfocus="displayNoteBox(\'input_' + i + '_' + j + '\');" />'
             } else {
                 tdNode.innerHTML = matrix[i][j].value
                 matrix[i][j].guess = matrix[i][j].value

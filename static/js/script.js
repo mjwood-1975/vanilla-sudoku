@@ -79,7 +79,6 @@ function placeNumber(y, x, number) {
     inputCell.value = ""
     if (number.match(/[^\d]/)) {
         if (number === 'Backspace') {
-            console.log('updateing matrix and local storage with null')
             inputCell.value = ""
             matrix[y][x].guess = null
             updateLocalStorage()
@@ -87,7 +86,6 @@ function placeNumber(y, x, number) {
             return
         }
     } else {
-        console.log('updating matrix and local storage')
         matrix[y][x].guess = Number(event.key)
         matrix[y][x].notes = {}
         for (let i = 0; i<9; i++) {
@@ -240,7 +238,7 @@ function createLayout() {
             trNode.appendChild(tdNode)
         }
         primaryGrid.appendChild(trNode)
-        time.innerHTML = matrix.timeMessage
+        if (matrix.timeMessage) time.innerHTML = matrix.timeMessage
     }
 
     let pge = primaryGrid.getBoundingClientRect()
@@ -316,7 +314,6 @@ function createLayout() {
                     }
                     tdNode.appendChild(span)
                     if (matrix[i][j].notes && matrix[i][j].notes[n]) {
-                        console.log('got a note:', matrix[i][j].notes[n])
                         let noteCell = document.getElementById('tr_' + i + '_td_' + j + '_note_' + n)
                         if (noteCell) noteCell.innerHTML = matrix[i][j].notes[n]
                     }
@@ -530,16 +527,12 @@ function setupMap() {
 }
 
 function createMatrix() {
-    console.log('createMatrix called..')
     matrix = setupMatrix()
     let boxes = setupBoxes()
     let cols = setupCols()
     let cellToBoxMap = setupMap()
 
     let tries = 1
-    let bombOut = 1
-    let badVPairFound = false
-    let badVPair = ""
     for (let rowIndex = 0; rowIndex < 9; rowIndex++) {
         for (let colIndex = 0; colIndex < 9; colIndex++) {
             let exclusions = boxes[cellToBoxMap[rowIndex+"_"+colIndex]]

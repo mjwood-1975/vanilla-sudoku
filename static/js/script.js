@@ -1,10 +1,115 @@
 let gameStarted = false
 let matrix
+let lastSelectedX
+let lastSelectedY
+let selectedCellX
+let selectedCellY
+
+const primaryColor = '#EEE9DA'
 
 // document.body.style.setProperty('--main-color',"#6c0")
 
 function updateLocalStorage() {
     localStorage.setItem("matrix", JSON.stringify(matrix))
+}
+
+function displayNoteBox(y,x) {
+    selectedCellY = y
+    selectedCellX = x
+
+    if (typeof lastSelectedX === "number" && typeof lastSelectedY === "number") {
+        let lastCellId = 'tr_' + lastSelectedY + '_td_' + lastSelectedX
+        let lastCellInputId = 'input_' + lastSelectedY + '_' + lastSelectedX
+        document.getElementById(lastCellId).style.backgroundColor = '#fff'
+        document.getElementById(lastCellInputId).style.backgroundColor = '#fff'
+    }
+    for (let i = 0; i < 9; i++) {
+        let id = 'note_' + i
+        let td = document.getElementById(id)
+        td.style.height = '50px'
+        td.style.width = '50px'
+        td.style.backgroundColor = '#fff'
+
+        let inputNoteCell = document.getElementById('input_note_' + i)
+        inputNoteCell.value = ""
+
+        if (matrix[selectedCellY][selectedCellX].notes && matrix[selectedCellY][selectedCellX].notes[i]) {
+            inputNoteCell.value = matrix[selectedCellY][selectedCellX].notes[i]
+        }
+    }
+
+    noteDiv.style.visibility = 'visible'
+    noteHeader.innerHTML = `notes for cell ${y+1},${x+1}`
+
+    let cellId = 'tr_' + y + '_td_' + x
+    let cellInputId = 'input_' + y + '_' + x
+    document.getElementById(cellId).style.backgroundColor = primaryColor
+    document.getElementById(cellInputId).style.backgroundColor = primaryColor
+    lastSelectedX = x
+    lastSelectedY = y
+
+}
+
+function hideNoteBox() {
+    noteBox.style.visibility = 'hidden'
+}
+
+function placeNote(index, number) {
+    let noteCell = document.getElementById('tr_' + selectedCellY + '_td_' + selectedCellX + '_note_' + index)
+    let inputNoteCell = document.getElementById('input_note_' + index)
+    inputNoteCell.value = ""
+    if (number.match(/[^\d]/)) {
+        if (number === 'Backspace') {
+            noteCell.innerHTML = ""
+            inputNoteCell.value = ""
+            matrix[selectedCellY][selectedCellX].notes[index] = null
+        } else {
+            return
+        }
+    } else {
+        if (!matrix[selectedCellY][selectedCellX].notes) matrix[selectedCellY][selectedCellX].notes = {}
+        matrix[selectedCellY][selectedCellX].notes[index] = Number(number)
+        updateLocalStorage()
+        noteCell.innerHTML = number
+    }
+}
+
+function placeNumber(y, x, number) {
+    let inputCell = document.getElementById('input_' + y + '_' + x)
+    inputCell.value = ""
+    if (number.match(/[^\d]/)) {
+        if (number === 'Backspace') {
+            console.log('updateing matrix and local storage with null')
+            inputCell.value = ""
+            matrix[y][x].guess = null
+            updateLocalStorage()
+        } else {
+            return
+        }
+    } else {
+        console.log('updating matrix and local storage')
+        matrix[y][x].guess = Number(event.key)
+        matrix[y][x].notes = {}
+        for (let i = 0; i<9; i++) {
+            let noteCell = document.getElementById('tr_' + y + '_td_' + x + '_note_' + i)
+            let inputNoteCell = document.getElementById('input_note_' + i)
+            noteCell.innerHTML = ""
+            inputNoteCell.value = ""
+            if (matrix[y][x].notes && matrix[y][x].notes[i]) {
+                matrix[y][x].notes = {}
+            }
+        }
+        updateLocalStorage()
+    }
+}
+
+function placeNoteBox() {
+    let bnp = buttonNewPuzzle.getBoundingClientRect()
+    let pge = primaryGrid.getBoundingClientRect()
+    noteDiv.style.position = "absolute"
+    noteDiv.style.top = bnp.y + bnp.height + 10 + 'px'
+    noteDiv.style.left = pge.x + pge.width + 10 + 'px'
+    noteDiv.style.width = bnp.width
 }
 
 function createLayout() {
@@ -31,11 +136,12 @@ function createLayout() {
         trNode.id = 'tr_' + i
         for (let j=0; j<gridCols; j++) {
             let tdNode = document.createElement('td')
-            tdNode.id = 'tr_' + i + '_td_' + j;
+            tdNode.id = 'tr_' + i + '_td_' + j
+            tdNode.className = 'gridCell'
             if (matrix[i][j].mask) {
                 let guess = matrix[i][j].guess ? matrix[i][j].guess : "" // cache
                 tdNode.innerHTML = ""
-                tdNode.innerHTML = '<input class="cell" type="number" id="input_' + i + '_' + j + '" maxlength="0" size="1" onClick="gameStarted=true" onKeyDown="matrix[' + i + '][' + j + '].guess = Number(event.key); this.style.color = \'#6096B4\'; updateLocalStorage();" value="' + guess + '" />'
+                tdNode.innerHTML = '<input class="cell" type="number" id="input_' + i + '_' + j + '" onClick="gameStarted=true" onKeyDown="placeNumber(' + i + ',' + j + ',event.key); this.style.color = \'#6096B4\'" value="' + guess + '" onfocus="displayNoteBox(' + i + ',' + j + ');" />'
             } else {
                 tdNode.innerHTML = matrix[i][j].value
                 matrix[i][j].guess = matrix[i][j].value
@@ -158,6 +264,66 @@ function createLayout() {
     buttonNewPuzzle.style.position = "absolute"
     buttonNewPuzzle.style.top = bvwh.y + bvwh.height + 10 + 'px'
     buttonNewPuzzle.style.left = pge.x + pge.width + 10 + 'px'
+
+    for (let i=0; i<gridRows; i++) {
+        for (let j=0; j<gridCols; j++) {
+            if (matrix[i][j].mask) {
+                for (let n = 0; n<9; n++) {
+                    let tdNode = document.getElementById('tr_' + i + '_td_' + j)
+                    let br = tdNode.getBoundingClientRect()
+                    let span = document.createElement('span')
+                    span.id = 'tr_' + i + '_td_' + j + '_note_' + n
+                    span.style.position = "absolute"
+                    span.style.fontSize = '14px'
+                    span.style.color = '#6096B4'
+                    switch (n) {
+                        case 0:
+                            span.style.top = br.top + 3
+                            span.style.left = br.left + 5
+                            break
+                        case 1:
+                            span.style.top = br.top + 3
+                            span.style.left = br.left + 24
+                            break
+                        case 2:
+                            span.style.top = br.top + 3
+                            span.style.left = br.left + 42
+                            break
+                        case 3:
+                            span.style.top = br.top + 18
+                            span.style.left = br.left + 5
+                            break
+                        case 4:
+                            span.style.top = br.top + 18
+                            span.style.left = br.left + 24
+                            break
+                        case 5:
+                            span.style.top = br.top + 18
+                            span.style.left = br.left + 42
+                            break
+                        case 6:
+                            span.style.top = br.top + 35
+                            span.style.left = br.left + 5
+                            break
+                        case 7:
+                            span.style.top = br.top + 35
+                            span.style.left = br.left + 24
+                            break
+                        case 8:
+                            span.style.top = br.top + 35
+                            span.style.left = br.left + 42
+                            break
+                    }
+                    tdNode.appendChild(span)
+                    if (matrix[i][j].notes && matrix[i][j].notes[n]) {
+                        console.log('got a note:', matrix[i][j].notes[n])
+                        let noteCell = document.getElementById('tr_' + i + '_td_' + j + '_note_' + n)
+                        if (noteCell) noteCell.innerHTML = matrix[i][j].notes[n]
+                    }
+                }
+            }
+        }
+    }
 }
 
 function prepareGridData() {
@@ -375,10 +541,7 @@ function createMatrix() {
     let badVPairFound = false
     let badVPair = ""
     for (let rowIndex = 0; rowIndex < 9; rowIndex++) {
-        // console.log('rowIndex: ', rowIndex)
         for (let colIndex = 0; colIndex < 9; colIndex++) {
-            // console.log('    colIndex: ', colIndex)
-            if (bombOut >= 500) { console.log('bombing out..'); process.exit() }
             let exclusions = boxes[cellToBoxMap[rowIndex+"_"+colIndex]]
             exclusions = exclusions.concat(cols[colIndex])
             exclusions = exclusions.concat(matrix[rowIndex])

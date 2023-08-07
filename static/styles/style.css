@@ -1,12 +1,3 @@
-/* meh
-:root {
-    --primary-color:#47A992;
-    --secondary-color:#482121;
-    --tertiary-color:#7A3E3E;
-    --trim-color:#EEEEEE;
-}
-*/
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -50,14 +41,14 @@ h3 {
 }
 
 
-table {
+table.grid {
     font-weight: bold;
     border-style: solid;
     border-color: black;
     border-width: thin;
 }
 
-td {
+td.gridCell {
     text-align: center;
     border-style: solid;
     border-color: gray;
@@ -156,4 +147,29 @@ div.modal p {
     font-size: 1em;
     padding: 1em;
     background-color: #eee;
+}
+
+#noteDiv {
+    visibility: hidden;
+    margin: 0;
+    padding: 0;
+    border: 1px solid black;
+    background-color: #eee;
+}
+
+#noteTable {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    border: 1px solid black;
+}
+
+#noteTable td {
+    margin: 0;
+    padding: 0;
+    border: 1px solid black;
+}
+
+input {
+    all: unset;
 }

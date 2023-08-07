@@ -9,8 +9,12 @@ const port = 443
 app.use(express.static('static'))
 app.use('/static', express.static('static'))
 
-app.get('/', function (req, res) {
-      res.send('Hello World')
+app.get('/', (req, res) => {
+   res.send('Hello World')
+})
+
+app.all('*', (req, res) => {
+    res.status(404).send("Not Found")
 })
 
 https.createServer({

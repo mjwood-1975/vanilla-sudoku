@@ -11,7 +11,7 @@
     <script language="javascript" src="js/script.js"></script>
   </head>
 
-  <body onLoad="createLayout();">
+  <body onLoad="createLayout(); placeNoteBox()">
     <h1>~Vanilla Sudoku~</h1>
     <h3>Plain is sometimes the best flavor</h3>
     <br />
@@ -67,31 +67,33 @@
             <br />
         </div>
 
-        <div id="noteBox">
-            <table id="noteTable" style="noteTable" cellpadding="0" cellspacing="0">
+        <div id="noteDiv">
+            <p id="noteHeader"></p>
+            <table id="noteTable" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td id="note_0"><input id="input_note_0" class="note" type="number" onKeyDown="placeNote(0)" /></td>
-                    <td id="note_1">2</td>
-                    <td id="note_2">3</td>
+                    <td id="note_0"><input class="cell" id="input_note_0" type="number" onKeyDown="placeNote(0, event.key)" /></td>
+                    <td id="note_1"><input class="cell" id="input_note_1" type="number" onKeyDown="placeNote(1, event.key)" /></td>
+                    <td id="note_2"><input class="cell" id="input_note_2" type="number" onKeyDown="placeNote(2, event.key)" /></td>
                 </tr>
                 <tr>
-                    <td id="note_3">4</td>
-                    <td id="note_null"></td>
-                    <td id="note_4">5</td>
+                    <td id="note_3"><input class="cell" id="input_note_3" type="number" onKeyDown="placeNote(3, event.key)" /></td>
+                    <td id="note_4"><input class="cell" id="input_note_4" type="number" onKeyDown="placeNote(4, event.key)" /></td>
+                    <td id="note_5"><input class="cell" id="input_note_5" type="number" onKeyDown="placeNote(5, event.key)" /></td>
                 </tr>
                 <tr>
-                    <td id="note_5">6</td>
-                    <td id="note_6">7</td>
-                    <td id="note_7">8</td>
+                    <td id="note_6"><input class="cell" id="input_note_6" type="number" onKeyDown="placeNote(6, event.key)" /></td>
+                    <td id="note_7"><input class="cell" id="input_note_7" type="number" onKeyDown="placeNote(7, event.key)" /></td>
+                    <td id="note_8"><input class="cell" id="input_note_8" type="number" onKeyDown="placeNote(8, event.key)" /></td>
                 </tr>
             </table>
+            <br />
+            <br />
         </div>
 
         <input class="button" id="buttonReset" type="button" value="Reset" onClick="resetPuzzle()" />
         <input class="button" id="buttonValidateWithoutHints" type="button" value="Validate -Hints" onClick="validateSolution(false)" />
         <input class="button" id="buttonValidateWithHints" type="button" value="Validate +Hints" onClick="validateSolution(true)" />
         <input class="button" id="buttonNewPuzzle" type="button" value="New Puzzle" onClick="location.href='/'; localStorage.removeItem('matrix')" />
-        <!-- <input class="button" id="buttonDebug" type="button" value="Debug" onClick="console.log(matrix)" /> -->
     </center>
   </body>
 </html>
